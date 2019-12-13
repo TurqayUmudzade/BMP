@@ -49,9 +49,8 @@ int LilEndianHexadecimalToDecimal(char hex[])
     return dec_val;
 }
 
-int main(int argc, char const *argv[])
+int main(int argc, char *argv[])
 {
-
-    printf("%d\n", LilEndianHexadecimalToDecimal("48C01200"));
+    printf("%d\n",LilEndianHexadecimalToDecimal(argv[1]));
     return 0;
 }
