@@ -65,9 +65,7 @@ void decode_out(const char *s);
 int main(void){
     make_tree();
     encode_out("HELLO );
-   // encode_out("JOKE");
-    decode_out(".... . .-.. .-.. --- / .-- --- .-. .-.. -..");
-    //decode_out(".--- --- -.- .");
+    decode_out(".... . .-.. .-.. --- / .-- --- .-. .-.. -..");  
     drop_tree();
     return 0;
 }
