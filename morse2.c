@@ -1,11 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
-char* morseEncode(char x)
+char *morseEncode(char x)
 {
-    // refer to the Morse table
-  
     switch (x)
     {
     case 'a':
@@ -58,33 +57,79 @@ char* morseEncode(char x)
         return "-..-";
     case 'y':
         return "-.--";
-    // for space
     case 'z':
         return "--..";
+
+        //numbers
+    case '0':
+        return ".-..";
+    case '1':
+        return "--";
+    case '2':
+        return "-.";
+    case '3':
+        return "---";
+    case '4':
+        return ".--.";
+    case '5':
+        return "--.-";
+    case '6':
+        return ".-.";
+    case '7':
+        return "...";
+    case '8':
+        return "-";
+    case '9':
+        return "..-";
+
+        //others
+    case ' ':
+        return " ";
+    case ':':
+        return "---... ";
+    case '-':
+        return "-....- ";
     }
 }
 
-void morseCode(char* s)
+void morseCodePrint(char *s)
 {
-    //int lenght=strlen(s);
-   // char* s =(char*) malloc(lenght+1);
-
-    for (int i = 0; s[i]!='\0'; i++)
-        printf("%s",morseEncode(s[i]));
+    char str[50];
+    //concats morse code letter by letter
+    for (int i = 0; s[i] != '\0'; i++)
+        strcat(str, morseEncode(s[i]));
+    //end result
+    printf("%s", str);
 }
 
-
-int main()
+//same function with return value
+char *morseCode(char *s)
 {
-    int lenght=strlen("Hello");
-    char* s =(char*) calloc(lenght+1,10);
-    char *word = (char *)malloc(20*sizeof(char));
-    //word = (char *)malloc(20*sizeof(char));
-    //char s[lenght+1];
-     word = "Hello";
-    
-   morseCode(word);
-    
+    //allocate memory
+    char *str = (char *)malloc(sizeof(char) * 3);
+    //concats morse code letter by letter
+    for (int i = 0; s[i] != '\0'; i++)
+        strcat(str, morseEncode(s[i]));
+    //end result
+    return str;
+}
 
+char *strlwr(char *str)
+{
+    unsigned char *p = (unsigned char *)str;
+
+    while (*p)
+    {
+        *p = tolower((unsigned char)*p);
+        p++;
+    }
+
+    return str;
+}
+
+int main(int argc, char *argv[])
+{
+    printf("Morse Code of %s is:\t %s\n", argv[1], morseCode(strlwr(argv[1])));
+    //  morseCode(strlwr(argv[1]));
     return 0;
 }
