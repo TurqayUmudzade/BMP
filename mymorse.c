@@ -89,6 +89,8 @@ char *morseEncode(char x)
         return "---... ";
     case '-':
         return "-....- ";
+            case '+':
+        return "·−·−·";
     }
 }
 
