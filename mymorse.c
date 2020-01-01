@@ -62,25 +62,25 @@ char *morseEncode(char x)
 
         //numbers
     case '0':
-        return ".-..";
+        return "-----";
     case '1':
-        return "--";
+        return ".----";
     case '2':
-        return "-.";
+        return "..---";
     case '3':
-        return "---";
+        return "...--";
     case '4':
-        return ".--.";
+        return "....- ";
     case '5':
-        return "--.-";
+        return .....";
     case '6':
-        return ".-.";
+        return "-.... ";
     case '7':
-        return "...";
+        return "--...";
     case '8':
-        return "-";
+        return "---.. ";
     case '9':
-        return "..-";
+        return "----.";
 
         //others
     case ' ':
