@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 
+//Takes a char and converts it to morse code
 char *morseEncode(char x)
 {
     switch (x)
@@ -59,28 +60,27 @@ char *morseEncode(char x)
         return "-.--";
     case 'z':
         return "--..";
-
         //numbers
     case '0':
-        return "-----";
+        return ".-..";
     case '1':
-        return ".----";
+        return "--";
     case '2':
-        return "..---";
+        return "-.";
     case '3':
-        return "...--";
+        return "---";
     case '4':
-        return "....- ";
+        return ".--.";
     case '5':
-        return .....";
+        return "--.-";
     case '6':
-        return "-.... ";
+        return ".-.";
     case '7':
-        return "--...";
+        return "...";
     case '8':
-        return "---.. ";
+        return "-";
     case '9':
-        return "----.";
+        return "..-";
 
         //others
     case ' ':
@@ -89,11 +89,15 @@ char *morseEncode(char x)
         return "---... ";
     case '-':
         return "-....- ";
-            case '+':
-        return "·−·−·";
+    case '+':
+        return ".-.-.";
+    //default
+    default:
+        printf("Error:Unknown Character\n");
     }
 }
 
+//prints mouse code
 void morseCodePrint(char *s)
 {
     char str[50];
@@ -104,7 +108,7 @@ void morseCodePrint(char *s)
     printf("%s", str);
 }
 
-//same function with return value
+//same as morseCodePrint but returns a string instead of void
 char *morseCode(char *s)
 {
     //allocate memory
@@ -116,6 +120,7 @@ char *morseCode(char *s)
     return str;
 }
 
+//changes a string to all lower letters since morseEncode function is for lower letters
 char *strlwr(char *str)
 {
     unsigned char *p = (unsigned char *)str;
