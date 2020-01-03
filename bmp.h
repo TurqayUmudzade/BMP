@@ -45,5 +45,9 @@ bool      check_bmp_header(BMPHeader* bmp_header, FILE* fp);
 bool      write_bmp(FILE* fp, BMPImage* image, char** error);
 void      free_bmp(BMPImage* image);
 BMPImage* crop_bmp(BMPImage* image, int x, int y, int w, int h, char** error);
+int str_to_int(char* str);
+char * char_to_string(char c);
+unsigned char * morseWord(unsigned char * text);
+unsigned char * write_morse(unsigned char * morse, int padding, unsigned char *tmp1, unsigned char * color_convert);
 
 #endif  /* bmp.h */

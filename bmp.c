@@ -1,11 +1,10 @@
-/*
- * A program to read, write, and crop BMP image files.
- * 
- */
 #include <stdio.h>
 #include <string.h>  // for strlen, strcopy
 #include <stdlib.h>  // for malloc
+#include <math.h>
 #include "bmp.h"
+#include "morse.c"
+#include "convertions.c"
 
 // Correct values for the header
 #define MAGIC_VALUE         0x4D42 
@@ -13,7 +12,7 @@
 #define COMPRESSION         0
 #define NUM_COLORS          0
 #define IMPORTANT_COLORS    0
-#define BITS_PER_PIXEL      24
+#define BITS_PER_PIXEL      32
 #define BITS_PER_BYTE       8
 
 BMPImage *read_bmp(FILE *fp, char **error);
@@ -54,12 +53,7 @@ BMPImage *read_bmp(FILE *fp, char **error)
     }
     // Check header
     bool is_valid_header = check_bmp_header(&image->header, fp);
-    // if(!_check(is_valid_header, error, "Invalid BMP file"))
-    // {
-    //     printf("SALAM2\n");
-    //     return NULL;
-    // }
-    // Allocate memory for image data
+    
     image->data = malloc(sizeof(*image->data) * image->header.image_size_bytes);
     if (!_check(image->data != NULL, error, "Not enough memory"))
     {
@@ -141,175 +135,6 @@ void free_bmp(BMPImage *image)
     free(image->data);
     free(image);
 }
-
-/*
- * Create a new image containing the cropped portion of the given image.
- * 
- * - Params:
- *       x - the start index, from the left edge of the input image.
- *       y - the start index, from the top edge of the input image.
- *       w - the width of the new image.
- *       h - the height of the new image.
- * 
- * - Postcondition: it is the caller's responsibility to free the memory
- *   for the error message and the returned image.
- * 
- * - Return: the cropped image as a BMPImage on the heap.
- */
-BMPImage *crop_bmp(BMPImage *image, int x, int y, int w, int h, char **error)
-{
-    BMPImage *new_image = malloc(sizeof(*new_image));
-    // Check size of cropedd image is less or equal than the size of original image
-    if (!_check
-            (
-                x + w <= image->header.width_px && y + h <= image->header.height_px,
-                error,
-                "The size of the new image should be equal or less than the size of the original")
-            )
-    {
-        return NULL;
-    }
-    // Update new_image header
-    new_image->header = image->header;
-    new_image->header.width_px = w;
-    new_image->header.height_px = h;
-    new_image->header.image_size_bytes = _get_image_size_bytes(&new_image->header);
-    new_image->header.size = BMP_HEADER_SIZE + new_image->header.image_size_bytes;
-    // Allocate memory for image data
-    new_image->data = malloc(sizeof(*new_image->data) * new_image->header.image_size_bytes);
-    if(!_check(new_image->data != NULL, error, "Not enough memory"))
-    {
-        return NULL;
-    }
-    int position_y = y * _get_image_row_size_bytes(&image->header);
-    int position_x_row = _get_position_x_row(x, &image->header);
-    printf("position_y : %d\n, position_x_row : %d\n",position_y,position_x_row);
-    int new_index = 0;
-    // Iterate image's columns
-    for (int i = 0; i < h; i++)
-    {
-        // Iterate image's rows
-        for (int j = 0; j < w; j++)
-        {
-            // Iterate image's pixels
-            for(int k = 0; k < 3; k++)
-            {              
-                new_image->data[new_index] = image->data[position_y + position_x_row];
-                new_index++;
-                position_x_row++;
-            }
-        }
-        // Add padding to new_image
-        int padding = _get_padding(&new_image->header);
-        for (int l = 0; l < padding; l++)
-        {  
-            new_image->data[new_index] = 0x00;
-            new_index++;
-        }
-        position_y += _get_image_row_size_bytes(&image->header);
-        position_x_row = _get_position_x_row(x, &image->header);
-    }
-
-    return new_image;
-}
-
-
-
-/*************************************************************************************************/
-
-BMPImage *little_bmp(BMPImage *image, int x, int y, int w, int h, char **error)
-{
-    BMPImage *new_image = malloc(sizeof(*new_image));
-    // Check size of cropedd image is less or equal than the size of original image
-    if (!_check
-            (
-                x + w <= image->header.width_px && y + h <= image->header.height_px,
-                error,
-                "The size of the new image should be equal or less than the size of the original")
-            )
-    {
-        return NULL;
-    }
-    // Update new_image header
-    new_image->header = image->header;
-    new_image->header.width_px = w;
-    new_image->header.height_px = h;
-    new_image->header.image_size_bytes = _get_image_size_bytes(&new_image->header);
-    new_image->header.size = BMP_HEADER_SIZE + new_image->header.image_size_bytes;
-    // Allocate memory for image data
-    new_image->data = malloc(sizeof(*new_image->data) * new_image->header.image_size_bytes);
-    if(!_check(new_image->data != NULL, error, "Not enough memory"))
-    {
-        return NULL;
-    }
-    int position_y = y * _get_image_row_size_bytes(&image->header);
-    int position_x_row = _get_position_x_row(x, &image->header);
-    int new_index = 0;
-    // Iterate image's columns
-    for (int i = 0; i < h; i++)
-    {
-        // Iterate image's rows
-        for (int j = 0; j < w; j++)
-        {
-            // Iterate image's pixels
-            for(int k = 0; k < 3; k++)
-            {              
-                new_image->data[new_index] = image->data[position_y + position_x_row];
-                new_index++;
-                position_x_row++;
-            }
-        }
-        // Add padding to new_image
-        int padding = _get_padding(&new_image->header);
-        for (int l = 0; l < padding; l++)
-        {  
-            new_image->data[new_index] = 0x00;
-            new_index++;
-        }
-        position_y += _get_image_row_size_bytes(&image->header);
-        position_x_row = _get_position_x_row(x, &image->header);
-    }
-
-    return new_image;
-}
-
-
-/*************************************************************************************************/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -426,5 +251,94 @@ char *_string_duplicate(const char *string)
     return copy;
 }
 
-char * char_to_string(char c);
-int str_to_int(char* str);
+
+unsigned char * write_morse(unsigned char * morse, int padding, unsigned char *new_reg, unsigned char * color_convert){
+int new_index = 0;
+	for (; *morse != '\0'; morse++)
+	{
+		switch (*morse)
+		{
+			case '.':
+			new_index = new_index + padding * 2;
+				for (int i = 0; i < 6; ++i){
+					new_reg[new_index + i]= color_convert[i];
+				}
+                //6 + padding * 2 skips a background pixel
+				new_index = new_index + (6 + padding) * 2;
+				break;
+			case '-':
+				for (int i = 0; i < 3; ++i)
+				{
+					new_index += padding * 2;
+					for (int j = 0; j < 6; ++j)
+					{
+						new_reg[new_index + j] = color_convert[j];
+					}
+					new_index += 6;
+				}
+				new_index += 6 + (padding * 2); 
+				break;
+			case ' ':
+                //Skip 2 more pixels
+				new_index += (6 + (padding * 2)) * 2;
+				break;
+			case '\n':
+                //Skip 5 more pixels
+				new_index += (6 + (padding * 2)) * 4;
+				break;
+			default: break;
+		}
+	}
+
+    return new_reg;
+}
+
+
+
+unsigned char * watermark(unsigned char * image, BMPHeader header, unsigned char * color, int x_pos, int y_pos, char * text)
+{
+	int padding,width,index;
+    unsigned char * color_convert;
+    unsigned char * morse = (unsigned char *)malloc(15 * strlen(text) * sizeof(char));
+	
+    int _number_byte = header.bits_per_pixel / 8;
+
+    //If the number of pixels is not multiple of 4, there is padding with the values 0
+	if( _number_byte != 4) 	padding = 0; 
+	else    padding = 1; //else padding is 1
+
+    if(((header.width_px * _number_byte) % 4) != 0) width = header.width_px * _number_byte + (4 - (header.width_px * _number_byte) % 4);
+	else width = header.width_px * _number_byte;
+
+    //Convert color to little endian
+    color_convert = HexToLittleEndian(color); 
+
+    //Get index of pixel on x_pos, y_pos
+    index = (header.height_px - y_pos - 1) * width + x_pos * _number_byte + header.dib_header_size; 
+    
+	//Convert to morse code
+	morse = morseCode(strlwr(text)); 
+
+	int size =  15 * strlen(morse); 
+
+    //Store values of image that will change
+	unsigned char * new = (unsigned char *)malloc(size * sizeof(char));
+	for (int i = 0; i < size; ++i){
+		new[i] = image[index + i]; //fills new with the values of the image
+	}
+
+    //Create new_reg to store string value of new
+	unsigned char * new_reg = (unsigned char *)malloc(2 * size * sizeof(char));     
+	string2hexString(new, new_reg, size); 
+
+    new_reg = write_morse(morse, padding, new_reg, color_convert);
+
+    //Convert value of new_reg to hexadecimal string and store it in new 
+	new = stringToHex(new_reg); 
+
+    //Change current pixels with modified pixels
+	for (int i = 0; i < size; ++i){
+		image[index + i] = new[i];
+	}
+	return image;
+}
